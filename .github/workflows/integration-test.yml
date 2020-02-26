@@ -1,0 +1,40 @@
+name: Test
+on:
+  push:
+    branches: [master]
+
+jobs:
+  test:
+    name: Integration Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Setup environment
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.5'
+
+      - name: Log into DockerHub
+        env:
+          PERSONAL_TOKEN: ${{ secrets.communitesukdeploybot_dockerhub_access_token }}
+        run: docker login --username communitesukdeploybot  --password $PERSONAL_TOKEN
+
+      - name: Pull Oracle image
+        run: docker pull store/oracle/database-enterprise:12.2.0.1
+
+      - name: Pull Linux Oracle SDK gumf from S3
+        run: put stuff into vendor thingy
+
+      - name: Run install Ruby oic8
+        run: bash fullpath + "Linux"
+
+      - name: Install bundler
+        run: gem install bundler -v '2.1.4'
+
+      - name: Install dependencies
+        run: bundle install --without staging
+
+      - name: Test
+        run: bundle exec rspec --exclude-pattern "**/unit/**/*_spec.rb, **/e2e/**/*_spec.rb"
